@@ -1,0 +1,21 @@
+{
+  "name": "saasbuilder-data-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Serveur indépendant SaasBuilder pour la lecture des bases Access et MySQL",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@regrapes/access-db-parser": "^2.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.14.0"
+  }
+}
