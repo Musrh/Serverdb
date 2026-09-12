@@ -18,7 +18,7 @@ const MAX_ACCESS_MB = Number(process.env.MAX_ACCESS_MB || 100)
 const MAX_ROWS = Number(process.env.MAX_ROWS || 5000)
 const DEFAULT_PAGE_SIZE = Math.min(Number(process.env.DEFAULT_PAGE_SIZE || 100), MAX_ROWS)
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "*")
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "https://mronlinestores.com,https://musrh.github.io")
   .split(",")
   .map(s => s.trim())
   .filter(Boolean)
