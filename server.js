@@ -208,20 +208,40 @@ app.get("/api/access/:sessionId/table/:table", (req, res) => {
     const table = session.parser.parseTable(tableName)
 
     /*
-     * Le package Access renvoie :
-     * { fields: [...], lines: [[...], [...]] }
-     * selon les versions.
+     * @regrapes/access-db-parser 2.x renvoie généralement :
+     *   [{ data: { Colonne: valeur, ... }, rowNumber: 1 }, ...]
+     * Certaines anciennes versions renvoient :
+     *   { fields: [...], lines: [[...], [...]] }
+     * On accepte les deux formats afin que les tables soient réellement
+     * affichables quelle que soit la version du parseur.
      */
-    const fields = table?.fields || []
-    const lines = table?.lines || []
+    let fields = []
+    let allRows = []
 
-    const allRows = lines.map(line => {
-      const row = {}
-      fields.forEach((field, index) => {
-        row[field] = jsonSafe(line[index])
+    if (Array.isArray(table)) {
+      allRows = table.map(item => {
+        const data = item?.data && typeof item.data === "object"
+          ? item.data
+          : (item && typeof item === "object" ? item : {})
+        return Object.fromEntries(
+          Object.entries(data).map(([key, value]) => [key, jsonSafe(value)])
+        )
       })
-      return row
-    })
+      fields = [...new Set(allRows.flatMap(row => Object.keys(row)))]
+      allRows = allRows.map(row =>
+        Object.fromEntries(fields.map(field => [field, row[field] ?? null]))
+      )
+    } else {
+      fields = Array.isArray(table?.fields) ? table.fields : []
+      const lines = Array.isArray(table?.lines) ? table.lines : []
+      allRows = lines.map(line => {
+        const row = {}
+        fields.forEach((field, index) => {
+          row[field] = jsonSafe(line?.[index])
+        })
+        return row
+      })
+    }
 
     const result = paginate(
       allRows,
